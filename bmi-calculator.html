@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BMI Calculator — GigglesGalaxy Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0a0f;--card:#13131a;--border:#1e1e2e;--accent:#6c63ff;--text:#e8e8f0;--muted:#7070a0;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+  header{background:rgba(10,10,15,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:18px 40px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;text-decoration:none;color:var(--text);}
+  .logo span{color:var(--accent);}
+  .back-btn{color:var(--muted);text-decoration:none;font-size:0.9rem;}
+  .back-btn:hover{color:var(--accent);}
+  main{max-width:580px;margin:0 auto;padding:60px 24px;}
+  h1{font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;margin-bottom:8px;}
+  h1 span{color:var(--accent);}
+  .subtitle{color:var(--muted);margin-bottom:40px;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:36px;margin-bottom:20px;}
+  .unit-toggle{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:28px;width:fit-content;}
+  .unit-btn{background:none;border:none;border-radius:7px;padding:8px 20px;color:var(--muted);cursor:pointer;font-family:inherit;font-size:0.9rem;transition:all 0.2s;}
+  .unit-btn.active{background:var(--accent);color:#fff;}
+  label{display:block;font-size:0.82rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;margin-top:20px;}
+  input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px 18px;color:var(--text);font-family:inherit;font-size:1rem;outline:none;transition:border-color 0.2s;}
+  input:focus{border-color:var(--accent);}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .btn{width:100%;background:linear-gradient(135deg,var(--accent),#a855f7);border:none;border-radius:12px;padding:16px;color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;transition:transform 0.15s;margin-top:24px;}
+  .btn:hover{transform:translateY(-2px);}
+  .result{display:none;margin-top:24px;}
+  .bmi-display{text-align:center;padding:32px;background:var(--bg);border:1px solid var(--border);border-radius:16px;margin-bottom:16px;}
+  .bmi-num{font-family:'Syne',sans-serif;font-size:4rem;font-weight:800;}
+  .bmi-cat{font-size:1.1rem;font-weight:600;margin-top:8px;}
+  .bmi-bar-wrap{background:var(--border);border-radius:8px;height:12px;margin:20px 0 8px;overflow:visible;position:relative;}
+  .bmi-bar{height:100%;border-radius:8px;background:linear-gradient(90deg,#3b82f6,#22c55e,#eab308,#ef4444);transition:all 0.4s;}
+  .bmi-needle{position:absolute;top:-4px;width:4px;height:20px;background:#fff;border-radius:2px;transition:left 0.4s;transform:translateX(-50%);}
+  .bmi-labels{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--muted);}
+  .stat-row{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;margin-bottom:10px;}
+  .stat-row .k{color:var(--muted);font-size:0.85rem;}
+  .stat-row .v{font-family:'Syne',sans-serif;font-weight:700;}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="index.html">Giggles<span>Galaxy</span> Tools</a>
+  <a class="back-btn" href="index.html">← All Tools</a>
+</header>
+<main>
+  <h1>⚖️ BMI <span>Calculator</span></h1>
+  <p class="subtitle">Calculate your Body Mass Index and health category</p>
+  <div class="card">
+    <div class="unit-toggle">
+      <button class="unit-btn active" id="metricBtn" onclick="setUnit('metric')">Metric (kg/cm)</button>
+      <button class="unit-btn" id="imperialBtn" onclick="setUnit('imperial')">Imperial (lb/ft)</button>
+    </div>
+    <div id="metricInputs">
+      <label>Weight (kg)</label>
+      <input type="number" id="weightKg" placeholder="70" min="1" max="500">
+      <label>Height (cm)</label>
+      <input type="number" id="heightCm" placeholder="175" min="50" max="300">
+    </div>
+    <div id="imperialInputs" style="display:none">
+      <label>Weight (lbs)</label>
+      <input type="number" id="weightLb" placeholder="154" min="1" max="1000">
+      <label>Height</label>
+      <div class="row2">
+        <div><input type="number" id="heightFt" placeholder="5 ft" min="1" max="9"></div>
+        <div><input type="number" id="heightIn" placeholder="9 in" min="0" max="11"></div>
+      </div>
+    </div>
+    <label>Age (optional)</label>
+    <input type="number" id="age" placeholder="25" min="2" max="120">
+    <button class="btn" onclick="calcBMI()">Calculate BMI</button>
+
+    <div class="result" id="result">
+      <div class="bmi-display">
+        <div class="bmi-num" id="bmiNum">--</div>
+        <div class="bmi-cat" id="bmiCat">--</div>
+        <div class="bmi-bar-wrap">
+          <div class="bmi-bar" style="width:100%"></div>
+          <div class="bmi-needle" id="bmiNeedle" style="left:0%"></div>
+        </div>
+        <div class="bmi-labels"><span>Underweight<br>&lt;18.5</span><span>Normal<br>18.5-25</span><span>Overweight<br>25-30</span><span>Obese<br>&gt;30</span></div>
+      </div>
+      <div class="stat-row"><span class="k">Healthy Weight Range</span><span class="v" id="healthyRange">--</span></div>
+      <div class="stat-row"><span class="k">Weight to Lose/Gain</span><span class="v" id="weightDiff">--</span></div>
+      <div class="stat-row"><span class="k">BMI Category</span><span class="v" id="bmiCatDetail">--</span></div>
+    </div>
+  </div>
+</main>
+<script>
+let unit = 'metric';
+function setUnit(u){
+  unit=u;
+  document.getElementById('metricInputs').style.display=u==='metric'?'':'none';
+  document.getElementById('imperialInputs').style.display=u==='imperial'?'':'none';
+  document.getElementById('metricBtn').classList.toggle('active',u==='metric');
+  document.getElementById('imperialBtn').classList.toggle('active',u==='imperial');
+}
+function calcBMI(){
+  let weightKg, heightM;
+  if(unit==='metric'){
+    weightKg = parseFloat(document.getElementById('weightKg').value);
+    heightM = parseFloat(document.getElementById('heightCm').value)/100;
+  } else {
+    const lb = parseFloat(document.getElementById('weightLb').value);
+    const ft = parseFloat(document.getElementById('heightFt').value)||0;
+    const inch = parseFloat(document.getElementById('heightIn').value)||0;
+    weightKg = lb*0.453592;
+    heightM = (ft*12+inch)*0.0254;
+  }
+  if(!weightKg||!heightM){alert('Please enter weight and height!');return;}
+  const bmi = weightKg/(heightM*heightM);
+  const minW = 18.5*heightM*heightM;
+  const maxW = 24.9*heightM*heightM;
+
+  const cats = [{max:18.5,cat:'Underweight',color:'#3b82f6'},{max:25,cat:'Normal Weight',color:'#22c55e'},{max:30,cat:'Overweight',color:'#eab308'},{max:999,cat:'Obese',color:'#ef4444'}];
+  const cat = cats.find(c=>bmi<c.max);
+
+  document.getElementById('bmiNum').textContent = bmi.toFixed(1);
+  document.getElementById('bmiNum').style.color = cat.color;
+  document.getElementById('bmiCat').textContent = cat.cat;
+  document.getElementById('bmiCat').style.color = cat.color;
+
+  // Needle position: BMI 10=0%, 40=100%
+  const pct = Math.min(Math.max(((bmi-10)/30)*100, 0), 100);
+  document.getElementById('bmiNeedle').style.left = pct+'%';
+
+  const diff = weightKg < minW ? (minW-weightKg).toFixed(1)+' kg to gain' : weightKg > maxW ? (weightKg-maxW).toFixed(1)+' kg to lose' : 'You\'re in range! 🎉';
+  document.getElementById('healthyRange').textContent = minW.toFixed(1)+' – '+maxW.toFixed(1)+' kg';
+  document.getElementById('weightDiff').textContent = diff;
+  document.getElementById('bmiCatDetail').textContent = cat.cat;
+  document.getElementById('result').style.display='block';
+}
+</script>
+</body>
+</html>

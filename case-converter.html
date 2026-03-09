@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Converter — GigglesGalaxy Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0a0f;--card:#13131a;--border:#1e1e2e;--accent:#6c63ff;--accent3:#43e97b;--text:#e8e8f0;--muted:#7070a0;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+  header{background:rgba(10,10,15,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:18px 40px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;text-decoration:none;color:var(--text);}
+  .logo span{color:var(--accent);}
+  .back-btn{color:var(--muted);text-decoration:none;font-size:0.9rem;}
+  .back-btn:hover{color:var(--accent);}
+  main{max-width:800px;margin:0 auto;padding:60px 24px;}
+  h1{font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;margin-bottom:8px;}
+  h1 span{color:var(--accent);}
+  .subtitle{color:var(--muted);margin-bottom:32px;}
+  textarea{width:100%;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;color:var(--text);font-family:inherit;font-size:1rem;min-height:180px;outline:none;resize:vertical;transition:border-color 0.2s;margin-bottom:20px;}
+  textarea:focus{border-color:var(--accent);}
+  .btns{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-bottom:24px;}
+  .conv-btn{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;color:var(--text);font-family:inherit;font-size:0.85rem;cursor:pointer;transition:all 0.2s;text-align:left;}
+  .conv-btn:hover{border-color:var(--accent);background:rgba(108,99,255,0.08);color:var(--accent);}
+  .conv-btn .name{font-weight:600;display:block;margin-bottom:3px;}
+  .conv-btn .preview{color:var(--muted);font-size:0.75rem;}
+  .output-area{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;display:none;}
+  #outputText{flex:1;font-size:1rem;line-height:1.6;word-break:break-word;}
+  .copy-btn{background:rgba(67,233,123,0.15);border:1px solid rgba(67,233,123,0.3);color:var(--accent3);border-radius:8px;padding:8px 14px;cursor:pointer;font-family:inherit;font-size:0.82rem;white-space:nowrap;transition:all 0.2s;flex-shrink:0;}
+  .copy-btn:hover{background:var(--accent3);color:#000;}
+  .active-label{font-family:'Syne',sans-serif;font-weight:700;font-size:0.8rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="index.html">Giggles<span>Galaxy</span> Tools</a>
+  <a class="back-btn" href="index.html">← All Tools</a>
+</header>
+<main>
+  <h1>🔡 Case <span>Converter</span></h1>
+  <p class="subtitle">Convert text to any case style instantly</p>
+
+  <textarea id="inputText" placeholder="Type or paste your text here..."></textarea>
+
+  <div class="btns">
+    <button class="conv-btn" onclick="convert('upper')"><span class="name">UPPER CASE</span><span class="preview">HELLO WORLD</span></button>
+    <button class="conv-btn" onclick="convert('lower')"><span class="name">lower case</span><span class="preview">hello world</span></button>
+    <button class="conv-btn" onclick="convert('title')"><span class="name">Title Case</span><span class="preview">Hello World</span></button>
+    <button class="conv-btn" onclick="convert('sentence')"><span class="name">Sentence case</span><span class="preview">Hello world today</span></button>
+    <button class="conv-btn" onclick="convert('camel')"><span class="name">camelCase</span><span class="preview">helloWorldToday</span></button>
+    <button class="conv-btn" onclick="convert('pascal')"><span class="name">PascalCase</span><span class="preview">HelloWorldToday</span></button>
+    <button class="conv-btn" onclick="convert('snake')"><span class="name">snake_case</span><span class="preview">hello_world_today</span></button>
+    <button class="conv-btn" onclick="convert('kebab')"><span class="name">kebab-case</span><span class="preview">hello-world-today</span></button>
+    <button class="conv-btn" onclick="convert('constant')"><span class="name">CONSTANT_CASE</span><span class="preview">HELLO_WORLD</span></button>
+    <button class="conv-btn" onclick="convert('dot')"><span class="name">dot.case</span><span class="preview">hello.world.today</span></button>
+    <button class="conv-btn" onclick="convert('alternate')"><span class="name">aLtErNaTe CaSe</span><span class="preview">hElLo WoRlD</span></button>
+    <button class="conv-btn" onclick="convert('inverse')"><span class="name">iNVERSE cASE</span><span class="preview">iNVERSE cASE</span></button>
+  </div>
+
+  <div class="output-area" id="outputArea">
+    <div style="flex:1">
+      <div class="active-label" id="activeLabel">Result</div>
+      <div id="outputText"></div>
+    </div>
+    <button class="copy-btn" onclick="copyResult()">📋 Copy</button>
+  </div>
+</main>
+<script>
+const labels = {upper:'UPPER CASE',lower:'lower case',title:'Title Case',sentence:'Sentence case',camel:'camelCase',pascal:'PascalCase',snake:'snake_case',kebab:'kebab-case',constant:'CONSTANT_CASE',dot:'dot.case',alternate:'aLtErNaTe CaSe',inverse:'iNVERSE cASE'};
+
+function convert(type){
+  const t = document.getElementById('inputText').value;
+  if(!t.trim()){alert('Please enter some text first!');return;}
+  let result = '';
+  if(type==='upper') result = t.toUpperCase();
+  else if(type==='lower') result = t.toLowerCase();
+  else if(type==='title') result = t.replace(/\w\S*/g, w=>w.charAt(0).toUpperCase()+w.substr(1).toLowerCase());
+  else if(type==='sentence') result = t.toLowerCase().replace(/(^\s*\w|[.!?]\s*\w)/g,c=>c.toUpperCase());
+  else if(type==='camel'){
+    result = t.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g,(m,c)=>c.toUpperCase());
+    result = result.charAt(0).toLowerCase()+result.slice(1);
+  }
+  else if(type==='pascal') result = t.toLowerCase().replace(/(?:^|\s|\W)(\w)/g,(m,c)=>c.toUpperCase()).replace(/\s+/g,'');
+  else if(type==='snake') result = t.trim().toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
+  else if(type==='kebab') result = t.trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+  else if(type==='constant') result = t.trim().toUpperCase().replace(/\s+/g,'_').replace(/[^A-Z0-9_]/g,'');
+  else if(type==='dot') result = t.trim().toLowerCase().replace(/\s+/g,'.').replace(/[^a-z0-9.]/g,'');
+  else if(type==='alternate') result = [...t].map((c,i)=>i%2===0?c.toLowerCase():c.toUpperCase()).join('');
+  else if(type==='inverse') result = [...t].map(c=>c===c.toUpperCase()?c.toLowerCase():c.toUpperCase()).join('');
+
+  document.getElementById('outputText').textContent = result;
+  document.getElementById('activeLabel').textContent = labels[type];
+  document.getElementById('outputArea').style.display = 'flex';
+}
+function copyResult(){
+  navigator.clipboard.writeText(document.getElementById('outputText').textContent);
+  const btn = document.querySelector('.copy-btn');
+  btn.textContent='✓ Copied!';setTimeout(()=>btn.textContent='📋 Copy',1500);
+}
+</script>
+</body>
+</html>

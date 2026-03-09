@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Counter — GigglesGalaxy Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0a0f;--card:#13131a;--border:#1e1e2e;--accent:#6c63ff;--text:#e8e8f0;--muted:#7070a0;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+  header{background:rgba(10,10,15,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:18px 40px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;text-decoration:none;color:var(--text);}
+  .logo span{color:var(--accent);}
+  .back-btn{color:var(--muted);text-decoration:none;font-size:0.9rem;transition:color 0.2s;}
+  .back-btn:hover{color:var(--accent);}
+  main{max-width:800px;margin:0 auto;padding:60px 24px;position:relative;z-index:1;}
+  h1{font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;margin-bottom:8px;}
+  h1 span{color:var(--accent);}
+  .subtitle{color:var(--muted);margin-bottom:40px;}
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+  .stat-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;text-align:center;}
+  .stat-box .val{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--accent);}
+  .stat-box .lbl{color:var(--muted);font-size:0.78rem;margin-top:4px;}
+  textarea{width:100%;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:1rem;min-height:300px;outline:none;resize:vertical;transition:border-color 0.2s;line-height:1.7;}
+  textarea:focus{border-color:var(--accent);}
+  .toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+  .tool-btn{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 14px;color:var(--muted);font-family:inherit;font-size:0.82rem;cursor:pointer;transition:all 0.2s;}
+  .tool-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .extra-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;}
+  .extra-row{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;}
+  .extra-row .k{color:var(--muted);font-size:0.85rem;}
+  .extra-row .v{font-family:'Syne',sans-serif;font-weight:700;color:var(--text);}
+  @media(max-width:500px){.stats-grid{grid-template-columns:repeat(2,1fr);}.extra-stats{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="index.html">Giggles<span>Galaxy</span> Tools</a>
+  <a class="back-btn" href="index.html">← All Tools</a>
+</header>
+<main>
+  <h1>📝 Word <span>Counter</span></h1>
+  <p class="subtitle">Count words, characters, sentences, paragraphs and reading time</p>
+
+  <div class="stats-grid">
+    <div class="stat-box"><div class="val" id="sWords">0</div><div class="lbl">Words</div></div>
+    <div class="stat-box"><div class="val" id="sChars">0</div><div class="lbl">Characters</div></div>
+    <div class="stat-box"><div class="val" id="sSentences">0</div><div class="lbl">Sentences</div></div>
+    <div class="stat-box"><div class="val" id="sParas">0</div><div class="lbl">Paragraphs</div></div>
+  </div>
+
+  <div class="toolbar">
+    <button class="tool-btn" onclick="clearText()">🗑️ Clear</button>
+    <button class="tool-btn" onclick="copyText()">📋 Copy All</button>
+    <button class="tool-btn" onclick="removeSpaces()">✂️ Remove Extra Spaces</button>
+    <button class="tool-btn" onclick="removeLineBreaks()">↩️ Remove Line Breaks</button>
+  </div>
+
+  <textarea id="textInput" placeholder="Start typing or paste your text here..." oninput="analyze()"></textarea>
+
+  <div class="extra-stats">
+    <div class="extra-row"><span class="k">Characters (no spaces)</span><span class="v" id="sCharsNoSpace">0</span></div>
+    <div class="extra-row"><span class="k">Unique Words</span><span class="v" id="sUnique">0</span></div>
+    <div class="extra-row"><span class="k">Reading Time</span><span class="v" id="sRead">0 sec</span></div>
+    <div class="extra-row"><span class="k">Speaking Time</span><span class="v" id="sSpeak">0 sec</span></div>
+    <div class="extra-row"><span class="k">Lines</span><span class="v" id="sLines">0</span></div>
+    <div class="extra-row"><span class="k">Avg Word Length</span><span class="v" id="sAvgWord">0</span></div>
+  </div>
+</main>
+<script>
+function analyze(){
+  const t = document.getElementById('textInput').value;
+  const words = t.trim() ? t.trim().split(/\s+/).filter(w=>w.length>0) : [];
+  const sentences = t.trim() ? t.split(/[.!?]+/).filter(s=>s.trim().length>0).length : 0;
+  const paras = t.trim() ? t.split(/\n\s*\n/).filter(p=>p.trim().length>0).length : 0;
+  const unique = new Set(words.map(w=>w.toLowerCase().replace(/[^a-z]/g,''))).size;
+  const readSec = Math.round((words.length/238)*60);
+  const speakSec = Math.round((words.length/130)*60);
+  const avgWordLen = words.length ? (words.join('').length/words.length).toFixed(1) : 0;
+
+  document.getElementById('sWords').textContent = words.length.toLocaleString();
+  document.getElementById('sChars').textContent = t.length.toLocaleString();
+  document.getElementById('sSentences').textContent = sentences;
+  document.getElementById('sParas').textContent = paras;
+  document.getElementById('sCharsNoSpace').textContent = t.replace(/\s/g,'').length.toLocaleString();
+  document.getElementById('sUnique').textContent = unique;
+  document.getElementById('sLines').textContent = t ? t.split('\n').length : 0;
+  document.getElementById('sAvgWord').textContent = avgWordLen + ' chars';
+
+  if(readSec < 60) document.getElementById('sRead').textContent = readSec + ' sec';
+  else document.getElementById('sRead').textContent = Math.floor(readSec/60) + ' min ' + (readSec%60) + ' sec';
+  if(speakSec < 60) document.getElementById('sSpeak').textContent = speakSec + ' sec';
+  else document.getElementById('sSpeak').textContent = Math.floor(speakSec/60) + ' min ' + (speakSec%60) + ' sec';
+}
+function clearText(){document.getElementById('textInput').value='';analyze();}
+function copyText(){navigator.clipboard.writeText(document.getElementById('textInput').value);}
+function removeSpaces(){document.getElementById('textInput').value=document.getElementById('textInput').value.replace(/ +/g,' ').trim();analyze();}
+function removeLineBreaks(){document.getElementById('textInput').value=document.getElementById('textInput').value.replace(/\n+/g,' ').trim();analyze();}
+</script>
+</body>
+</html>

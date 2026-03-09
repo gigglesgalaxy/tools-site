@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GigglesGalaxy Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --card: #13131a;
+    --border: #1e1e2e;
+    --accent: #6c63ff;
+    --accent2: #ff6584;
+    --accent3: #43e97b;
+    --text: #e8e8f0;
+    --muted: #7070a0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at 20% 20%, rgba(108,99,255,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, rgba(255,101,132,0.06) 0%, transparent 60%);
+    pointer-events: none; z-index: 0;
+  }
+
+  header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; }
+  .logo span { color: var(--accent); }
+  .logo em { color: var(--accent2); font-style: normal; }
+
+  .search-bar {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 50px; padding: 10px 20px; width: 320px;
+    transition: border-color 0.2s;
+  }
+  .search-bar:focus-within { border-color: var(--accent); }
+  .search-bar input { background: none; border: none; outline: none; color: var(--text); font-family: inherit; font-size: 0.9rem; flex: 1; }
+  .search-bar svg { color: var(--muted); flex-shrink: 0; }
+
+  main { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 60px 24px 100px; }
+
+  .hero { text-align: center; margin-bottom: 70px; }
+  .hero h1 { font-family: 'Syne', sans-serif; font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 800; line-height: 1.1; }
+  .hero h1 .g1 { color: var(--accent); }
+  .hero h1 .g2 { color: var(--accent2); }
+  .hero p { color: var(--muted); font-size: 1.1rem; margin-top: 16px; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(108,99,255,0.1); border: 1px solid rgba(108,99,255,0.3); color: var(--accent); border-radius: 50px; padding: 6px 16px; font-size: 0.8rem; font-weight: 500; margin-bottom: 24px; }
+
+  .section-title { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-bottom: 60px; }
+
+  .tool-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px;
+    text-decoration: none; color: var(--text);
+    transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+    display: flex; flex-direction: column; gap: 12px;
+    position: relative; overflow: hidden;
+  }
+  .tool-card::before {
+    content: ''; position: absolute; inset: 0; opacity: 0;
+    background: linear-gradient(135deg, rgba(108,99,255,0.06), transparent);
+    transition: opacity 0.25s;
+  }
+  .tool-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+  .tool-card:hover::before { opacity: 1; }
+
+  .tool-icon { font-size: 2rem; line-height: 1; }
+  .tool-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; }
+  .tool-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.5; flex: 1; }
+  .tool-tag { display: inline-block; background: rgba(108,99,255,0.12); color: var(--accent); border-radius: 6px; padding: 3px 10px; font-size: 0.73rem; font-weight: 500; width: fit-content; }
+  .tool-tag.text { background: rgba(67,233,123,0.1); color: var(--accent3); }
+  .tool-tag.calc { background: rgba(255,101,132,0.1); color: var(--accent2); }
+  .tool-tag.random { background: rgba(255,193,7,0.1); color: #ffc107; }
+  .tool-tag.design { background: rgba(0,188,212,0.1); color: #00bcd4; }
+  .tool-tag.date { background: rgba(156,39,176,0.1); color: #ce93d8; }
+
+  footer { text-align: center; color: var(--muted); font-size: 0.85rem; padding: 40px; border-top: 1px solid var(--border); }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  @media (max-width: 600px) {
+    header { padding: 14px 16px; }
+    .search-bar { width: 180px; }
+    main { padding: 40px 16px 80px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Giggles<span>Galaxy</span> <em>Tools</em></div>
+  <div class="search-bar">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="searchInput" placeholder="Search tools..." oninput="filterTools(this.value)">
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="hero-badge">⚡ 15 Free Tools — No Login Required</div>
+    <h1>Your <span class="g1">Ultimate</span><br>Web <span class="g2">Toolkit</span></h1>
+    <p>Calculators, generators, converters & more — all free, all instant.</p>
+  </div>
+
+  <div class="section-title">🧮 Calculators</div>
+  <div class="tools-grid" id="toolsGrid">
+
+    <a href="age-calculator.html" class="tool-card" data-name="age calculator birthdate">
+      <div class="tool-icon">🎂</div>
+      <div class="tool-name">Age Calculator</div>
+      <div class="tool-desc">Calculate exact age from birthdate in years, months, days, hours & minutes.</div>
+      <div class="tool-tag calc">Calculator</div>
+    </a>
+
+    <a href="date-calculator.html" class="tool-card" data-name="date time calculator days between">
+      <div class="tool-icon">📅</div>
+      <div class="tool-name">Date Calculator</div>
+      <div class="tool-desc">Find days between dates, add/subtract days, past & future dates with countdown.</div>
+      <div class="tool-tag date">Date</div>
+    </a>
+
+    <a href="bmi-calculator.html" class="tool-card" data-name="bmi body mass index health weight">
+      <div class="tool-icon">⚖️</div>
+      <div class="tool-name">BMI Calculator</div>
+      <div class="tool-desc">Calculate your Body Mass Index and find out your health category instantly.</div>
+      <div class="tool-tag calc">Calculator</div>
+    </a>
+
+    <a href="percentage-calculator.html" class="tool-card" data-name="percentage calculator math">
+      <div class="tool-icon">💯</div>
+      <div class="tool-name">Percentage Calculator</div>
+      <div class="tool-desc">Calculate percentages, percentage change, and find what percent one number is of another.</div>
+      <div class="tool-tag calc">Calculator</div>
+    </a>
+
+  </div>
+
+  <div class="section-title">✍️ Text Tools</div>
+  <div class="tools-grid">
+
+    <a href="word-counter.html" class="tool-card" data-name="word counter character count text">
+      <div class="tool-icon">📝</div>
+      <div class="tool-name">Word Counter</div>
+      <div class="tool-desc">Count words, characters, sentences, paragraphs and reading time instantly.</div>
+      <div class="tool-tag text">Text</div>
+    </a>
+
+    <a href="case-converter.html" class="tool-card" data-name="case converter uppercase lowercase title">
+      <div class="tool-icon">🔡</div>
+      <div class="tool-name">Case Converter</div>
+      <div class="tool-desc">Convert text to UPPER, lower, Title Case, camelCase, snake_case and more.</div>
+      <div class="tool-tag text">Text</div>
+    </a>
+
+    <a href="fancy-font.html" class="tool-card" data-name="fancy font generator unicode stylish text">
+      <div class="tool-icon">✨</div>
+      <div class="tool-name">Fancy Font Generator</div>
+      <div class="tool-desc">Generate stylish unicode text for Instagram, Twitter, bios and social media.</div>
+      <div class="tool-tag design">Design</div>
+    </a>
+
+    <a href="lorem-ipsum.html" class="tool-card" data-name="lorem ipsum placeholder text generator">
+      <div class="tool-icon">📄</div>
+      <div class="tool-name">Lorem Ipsum Generator</div>
+      <div class="tool-desc">Generate placeholder text for designs, mockups, and development projects.</div>
+      <div class="tool-tag text">Text</div>
+    </a>
+
+  </div>
+
+  <div class="section-title">🎲 Generators & Fun</div>
+  <div class="tools-grid">
+
+    <a href="password-generator.html" class="tool-card" data-name="password generator strong secure random">
+      <div class="tool-icon">🔐</div>
+      <div class="tool-name">Password Generator</div>
+      <div class="tool-desc">Generate strong, secure passwords with custom length and character options.</div>
+      <div class="tool-tag random">Security</div>
+    </a>
+
+    <a href="fantasy-name.html" class="tool-card" data-name="fantasy name generator elf dwarf orc viking">
+      <div class="tool-icon">🧙</div>
+      <div class="tool-name">Fantasy Name Generator</div>
+      <div class="tool-desc">Generate names for Elves, Dwarves, Orcs, Vikings, Wizards and more fantasy races.</div>
+      <div class="tool-tag random">Fantasy</div>
+    </a>
+
+    <a href="greek-mythology.html" class="tool-card" data-name="greek mythology gods names generator zeus athena">
+      <div class="tool-icon">⚡</div>
+      <div class="tool-name">Greek Mythology Names</div>
+      <div class="tool-desc">Discover and generate names inspired by Greek gods, heroes, titans and myths.</div>
+      <div class="tool-tag random">Mythology</div>
+    </a>
+
+    <a href="qr-generator.html" class="tool-card" data-name="qr code generator barcode scan">
+      <div class="tool-icon">📱</div>
+      <div class="tool-name">QR Code Generator</div>
+      <div class="tool-desc">Create QR codes for URLs, text, WiFi, and contact info. Download as PNG instantly.</div>
+      <div class="tool-tag design">Design</div>
+    </a>
+
+  </div>
+
+  <div class="section-title">🌍 Utility Tools</div>
+  <div class="tools-grid">
+
+    <a href="public-holidays.html" class="tool-card" data-name="public holidays finder country calendar">
+      <div class="tool-icon">🏖️</div>
+      <div class="tool-name">Public Holiday Finder</div>
+      <div class="tool-desc">Find public holidays for any country and year. Plan your vacations ahead.</div>
+      <div class="tool-tag date">Calendar</div>
+    </a>
+
+    <a href="color-picker.html" class="tool-card" data-name="color picker hex rgb hsl palette">
+      <div class="tool-icon">🎨</div>
+      <div class="tool-name">Color Picker</div>
+      <div class="tool-desc">Pick colors and get HEX, RGB, HSL values. Generate beautiful color palettes.</div>
+      <div class="tool-tag design">Design</div>
+    </a>
+
+    <a href="unit-converter.html" class="tool-card" data-name="unit converter length weight temperature km miles feet">
+      <div class="tool-icon">📏</div>
+      <div class="tool-name">Unit Converter</div>
+      <div class="tool-desc">Convert length, weight, temperature, speed and more units instantly.</div>
+      <div class="tool-tag calc">Converter</div>
+    </a>
+
+  </div>
+</main>
+
+<footer>
+  <p>© 2026 GigglesGalaxy Tools &mdash; Built with ❤️ for <a href="#">tools.gigglesgalaxy.com</a></p>
+</footer>
+
+<script>
+function filterTools(q) {
+  q = q.toLowerCase();
+  document.querySelectorAll('.tool-card').forEach(card => {
+    const name = (card.dataset.name || '') + card.querySelector('.tool-name').textContent;
+    card.style.display = name.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>

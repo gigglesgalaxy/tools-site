@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Date Calculator — GigglesGalaxy Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0a0f;--card:#13131a;--border:#1e1e2e;--accent:#a855f7;--text:#e8e8f0;--muted:#7070a0;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+  header{background:rgba(10,10,15,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:18px 40px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;text-decoration:none;color:var(--text);}
+  .logo span{color:#6c63ff;}
+  .back-btn{color:var(--muted);text-decoration:none;font-size:0.9rem;}
+  .back-btn:hover{color:var(--accent);}
+  main{max-width:700px;margin:0 auto;padding:60px 24px;}
+  h1{font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;margin-bottom:8px;}
+  h1 span{color:var(--accent);}
+  .subtitle{color:var(--muted);margin-bottom:40px;}
+  .tabs{display:flex;gap:8px;margin-bottom:28px;}
+  .tab{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 20px;cursor:pointer;font-family:inherit;font-size:0.85rem;color:var(--muted);transition:all 0.2s;}
+  .tab.active,.tab:hover{border-color:var(--accent);color:var(--accent);}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:36px;}
+  label{display:block;font-size:0.82rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;margin-top:20px;}
+  input,select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px 18px;color:var(--text);font-family:inherit;font-size:0.95rem;outline:none;transition:border-color 0.2s;}
+  input:focus,select:focus{border-color:var(--accent);}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .btn{width:100%;background:linear-gradient(135deg,var(--accent),#ec4899);border:none;border-radius:12px;padding:16px;color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;margin-top:24px;transition:transform 0.15s;}
+  .btn:hover{transform:translateY(-2px);}
+  .result-box{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:20px;margin-top:20px;display:none;}
+  .result-main{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:var(--accent);margin-bottom:12px;}
+  .result-detail{color:var(--muted);font-size:0.9rem;line-height:1.7;}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="index.html">Giggles<span>Galaxy</span> Tools</a>
+  <a class="back-btn" href="index.html">← All Tools</a>
+</header>
+<main>
+  <h1>📅 Date <span>Calculator</span></h1>
+  <p class="subtitle">Days between dates, add/subtract days, and more</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="setMode('diff',this)">Days Between Dates</button>
+    <button class="tab" onclick="setMode('add',this)">Add/Subtract Days</button>
+    <button class="tab" onclick="setMode('week',this)">Week Number</button>
+  </div>
+
+  <div class="card">
+    <!-- Diff mode -->
+    <div id="diffMode">
+      <label>Start Date</label>
+      <input type="date" id="d1">
+      <label>End Date</label>
+      <input type="date" id="d2">
+      <button class="btn" onclick="calcDiff()">Calculate Difference</button>
+      <div class="result-box" id="diffResult">
+        <div class="result-main" id="diffMain"></div>
+        <div class="result-detail" id="diffDetail"></div>
+      </div>
+    </div>
+
+    <!-- Add mode -->
+    <div id="addMode" style="display:none">
+      <label>Start Date</label>
+      <input type="date" id="addStart">
+      <label>Operation</label>
+      <div class="row2">
+        <select id="addOp"><option value="add">Add (+)</option><option value="sub">Subtract (-)</option></select>
+        <input type="number" id="addDays" placeholder="Number of days" min="0">
+      </div>
+      <button class="btn" onclick="calcAdd()">Calculate Date</button>
+      <div class="result-box" id="addResult">
+        <div class="result-main" id="addMain"></div>
+        <div class="result-detail" id="addDetail"></div>
+      </div>
+    </div>
+
+    <!-- Week mode -->
+    <div id="weekMode" style="display:none">
+      <label>Select Date</label>
+      <input type="date" id="weekDate">
+      <button class="btn" onclick="calcWeek()">Get Week Info</button>
+      <div class="result-box" id="weekResult">
+        <div class="result-main" id="weekMain"></div>
+        <div class="result-detail" id="weekDetail"></div>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+const today = new Date().toISOString().split('T')[0];
+document.querySelectorAll('input[type=date]').forEach(i=>i.value=today);
+const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+let mode='diff';
+function setMode(m,btn){
+  mode=m;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  ['diffMode','addMode','weekMode'].forEach(id=>document.getElementById(id).style.display='none');
+  document.getElementById(m+'Mode').style.display='';
+}
+
+function calcDiff(){
+  const d1=new Date(document.getElementById('d1').value);
+  const d2=new Date(document.getElementById('d2').value);
+  if(!document.getElementById('d1').value||!document.getElementById('d2').value)return;
+  const diff=Math.abs(d2-d1);
+  const totalDays=Math.floor(diff/86400000);
+  const weeks=Math.floor(totalDays/7);
+  const rem=totalDays%7;
+  const months_=Math.floor(totalDays/30.44);
+  const earlier=d1<d2?d1:d2, later=d1<d2?d2:d1;
+  document.getElementById('diffMain').textContent=totalDays.toLocaleString()+' days';
+  document.getElementById('diffDetail').innerHTML=`<b>${weeks}</b> weeks and <b>${rem}</b> days<br><b>≈ ${months_}</b> months<br>From <b>${days[earlier.getDay()]}, ${months[earlier.getMonth()]} ${earlier.getDate()}, ${earlier.getFullYear()}</b> to <b>${days[later.getDay()]}, ${months[later.getMonth()]} ${later.getDate()}, ${later.getFullYear()}</b>`;
+  document.getElementById('diffResult').style.display='block';
+}
+
+function calcAdd(){
+  const start=new Date(document.getElementById('addStart').value);
+  const n=parseInt(document.getElementById('addDays').value);
+  const op=document.getElementById('addOp').value;
+  if(!document.getElementById('addStart').value||isNaN(n))return;
+  const result=new Date(start);
+  op==='add'?result.setDate(result.getDate()+n):result.setDate(result.getDate()-n);
+  document.getElementById('addMain').textContent=`${days[result.getDay()]}, ${months[result.getMonth()]} ${result.getDate()}, ${result.getFullYear()}`;
+  document.getElementById('addDetail').innerHTML=`<b>${n}</b> days ${op==='add'?'after':'before'} <b>${months[start.getMonth()]} ${start.getDate()}, ${start.getFullYear()}</b>`;
+  document.getElementById('addResult').style.display='block';
+}
+
+function calcWeek(){
+  const d=new Date(document.getElementById('weekDate').value);
+  if(!document.getElementById('weekDate').value)return;
+  const startOfYear=new Date(d.getFullYear(),0,1);
+  const weekNum=Math.ceil(((d-startOfYear)/86400000+startOfYear.getDay()+1)/7);
+  const startOfWeek=new Date(d);
+  startOfWeek.setDate(d.getDate()-d.getDay());
+  const endOfWeek=new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate()+6);
+  document.getElementById('weekMain').textContent='Week '+weekNum+' of '+d.getFullYear();
+  document.getElementById('weekDetail').innerHTML=`<b>${days[d.getDay()]}</b>, ${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}<br>Week runs: <b>${months[startOfWeek.getMonth()]} ${startOfWeek.getDate()}</b> – <b>${months[endOfWeek.getMonth()]} ${endOfWeek.getDate()}</b><br>Day <b>${Math.floor((d-startOfYear)/86400000)+1}</b> of ${d.getFullYear()}`;
+  document.getElementById('weekResult').style.display='block';
+}
+</script>
+</body></html>

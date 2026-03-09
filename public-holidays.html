@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Public Holiday Finder — GigglesGalaxy Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0a0f;--card:#13131a;--border:#1e1e2e;--accent:#f59e0b;--accent2:#6c63ff;--text:#e8e8f0;--muted:#7070a0;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+  header{background:rgba(10,10,15,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:18px 40px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;text-decoration:none;color:var(--text);}
+  .logo span{color:var(--accent2);}
+  .back-btn{color:var(--muted);text-decoration:none;font-size:0.9rem;}
+  .back-btn:hover{color:var(--accent);}
+  main{max-width:800px;margin:0 auto;padding:60px 24px;}
+  h1{font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;margin-bottom:8px;}
+  h1 span{color:var(--accent);}
+  .subtitle{color:var(--muted);margin-bottom:40px;}
+  .controls{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px;}
+  select{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;color:var(--text);font-family:inherit;font-size:0.95rem;outline:none;transition:border-color 0.2s;cursor:pointer;}
+  select:focus{border-color:var(--accent);}
+  .btn{background:linear-gradient(135deg,var(--accent),#f97316);border:none;border-radius:12px;padding:14px 28px;color:#000;font-family:'Syne',sans-serif;font-weight:700;cursor:pointer;font-size:0.95rem;transition:transform 0.15s;}
+  .btn:hover{transform:translateY(-2px);}
+  .summary-bar{display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap;}
+  .sum-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:12px;}
+  .sum-box .num{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--accent);}
+  .sum-box .lbl{color:var(--muted);font-size:0.8rem;}
+  .holidays-list{display:flex;flex-direction:column;gap:10px;}
+  .holiday-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;display:flex;justify-content:space-between;align-items:center;gap:16px;transition:border-color 0.2s;}
+  .holiday-card:hover{border-color:var(--accent);}
+  .holiday-card.upcoming{border-color:rgba(245,158,11,0.4);}
+  .holiday-card.today{border-color:var(--accent);background:rgba(245,158,11,0.05);}
+  .holiday-date{font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;min-width:100px;}
+  .holiday-name{flex:1;font-weight:500;}
+  .holiday-dow{color:var(--muted);font-size:0.8rem;}
+  .badge{border-radius:20px;padding:3px 10px;font-size:0.73rem;font-weight:600;}
+  .badge.today{background:rgba(245,158,11,0.2);color:var(--accent);}
+  .badge.upcoming{background:rgba(108,99,255,0.15);color:var(--accent2);}
+  .badge.past{background:rgba(255,255,255,0.05);color:var(--muted);}
+  .countdown{color:var(--accent2);font-size:0.8rem;font-weight:500;}
+  .loading{text-align:center;color:var(--muted);padding:40px;}
+  .error{text-align:center;color:#ef4444;padding:40px;}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="index.html">Giggles<span>Galaxy</span> Tools</a>
+  <a class="back-btn" href="index.html">← All Tools</a>
+</header>
+<main>
+  <h1>🏖️ Public <span>Holiday Finder</span></h1>
+  <p class="subtitle">Find public holidays for any country and year</p>
+
+  <div class="controls">
+    <select id="country">
+      <option value="IN">🇮🇳 India</option>
+      <option value="US">🇺🇸 United States</option>
+      <option value="GB">🇬🇧 United Kingdom</option>
+      <option value="AU">🇦🇺 Australia</option>
+      <option value="CA">🇨🇦 Canada</option>
+      <option value="DE">🇩🇪 Germany</option>
+      <option value="FR">🇫🇷 France</option>
+      <option value="JP">🇯🇵 Japan</option>
+      <option value="CN">🇨🇳 China</option>
+      <option value="BR">🇧🇷 Brazil</option>
+      <option value="MX">🇲🇽 Mexico</option>
+      <option value="ZA">🇿🇦 South Africa</option>
+      <option value="SG">🇸🇬 Singapore</option>
+      <option value="AE">🇦🇪 UAE</option>
+      <option value="NZ">🇳🇿 New Zealand</option>
+      <option value="IT">🇮🇹 Italy</option>
+      <option value="ES">🇪🇸 Spain</option>
+      <option value="NL">🇳🇱 Netherlands</option>
+      <option value="PH">🇵🇭 Philippines</option>
+      <option value="ID">🇮🇩 Indonesia</option>
+    </select>
+    <select id="year">
+      <option value="2024">2024</option>
+      <option value="2025">2025</option>
+      <option value="2026" selected>2026</option>
+      <option value="2027">2027</option>
+    </select>
+    <button class="btn" onclick="loadHolidays()">Find Holidays</button>
+  </div>
+
+  <div id="summary" style="display:none" class="summary-bar">
+    <div class="sum-box"><span class="num" id="totalCount">0</span><span class="lbl">Total Holidays</span></div>
+    <div class="sum-box"><span class="num" id="upcomingCount">0</span><span class="lbl">Upcoming</span></div>
+    <div class="sum-box"><span class="num" id="nextDays">0</span><span class="lbl">Days to Next</span></div>
+  </div>
+
+  <div id="holidaysList"></div>
+</main>
+<script>
+const dow=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+async function loadHolidays(){
+  const country = document.getElementById('country').value;
+  const year = document.getElementById('year').value;
+  const list = document.getElementById('holidaysList');
+  list.innerHTML = '<div class="loading">⏳ Loading holidays...</div>';
+  document.getElementById('summary').style.display='none';
+
+  try{
+    const res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/${country}`);
+    if(!res.ok) throw new Error('Not found');
+    const data = await res.json();
+    if(!data.length){list.innerHTML='<div class="error">No holiday data available for this country/year.</div>';return;}
+    
+    const today = new Date();today.setHours(0,0,0,0);
+    let upcoming=0, nextDays=Infinity;
+    
+    const html = data.map(h=>{
+      const d = new Date(h.date+'T00:00:00');
+      const isToday = d.getTime()===today.getTime();
+      const isPast = d < today;
+      const diff = Math.floor((d-today)/86400000);
+      if(!isPast&&!isToday)upcoming++;
+      if(diff>0&&diff<nextDays)nextDays=diff;
+      
+      const cls = isToday?'today':isPast?'':'upcoming';
+      const badge = isToday?'<span class="badge today">Today 🎉</span>':isPast?'<span class="badge past">Past</span>':'<span class="badge upcoming">Upcoming</span>';
+      const countdown = !isPast&&!isToday?`<span class="countdown">in ${diff} day${diff>1?'s':''}</span>`:'';
+      return`<div class="holiday-card ${cls}">
+        <div class="holiday-date">${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}</div>
+        <div><div class="holiday-name">${h.localName||h.name}</div><div class="holiday-dow">${dow[d.getDay()]}</div></div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">${badge}${countdown}</div>
+      </div>`;
+    }).join('');
+    
+    list.innerHTML='<div class="holidays-list">'+html+'</div>';
+    document.getElementById('totalCount').textContent=data.length;
+    document.getElementById('upcomingCount').textContent=upcoming;
+    document.getElementById('nextDays').textContent=nextDays===Infinity?'—':nextDays;
+    document.getElementById('summary').style.display='flex';
+  } catch(e){
+    list.innerHTML='<div class="error">⚠️ Could not load holidays. Please check your internet connection and try again.<br><br><small>This tool uses the Nager.Date API for holiday data.</small></div>';
+  }
+}
+
+loadHolidays();
+</script>
+</body></html>

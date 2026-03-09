@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fancy Font Generator — GigglesGalaxy Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0a0f;--card:#13131a;--border:#1e1e2e;--accent:#6c63ff;--accent2:#ff6584;--text:#e8e8f0;--muted:#7070a0;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(255,101,132,0.06) 0%,transparent 60%);pointer-events:none;}
+  header{background:rgba(10,10,15,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:18px 40px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;text-decoration:none;color:var(--text);}
+  .logo span{color:var(--accent);}
+  .back-btn{display:flex;align-items:center;gap:8px;color:var(--muted);text-decoration:none;font-size:0.9rem;transition:color 0.2s;}
+  .back-btn:hover{color:var(--accent);}
+  main{max-width:800px;margin:0 auto;padding:60px 24px;position:relative;z-index:1;}
+  h1{font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;margin-bottom:8px;}
+  h1 span{color:var(--accent2);}
+  .subtitle{color:var(--muted);margin-bottom:40px;}
+  .input-area{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px;margin-bottom:32px;}
+  textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px;color:var(--text);font-family:inherit;font-size:1.1rem;min-height:100px;outline:none;resize:vertical;transition:border-color 0.2s;}
+  textarea:focus{border-color:var(--accent);}
+  .results{display:grid;gap:12px;}
+  .font-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;transition:border-color 0.2s;}
+  .font-card:hover{border-color:var(--accent);}
+  .font-card .style-label{color:var(--muted);font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;min-width:120px;}
+  .font-card .text{font-size:1.2rem;flex:1;word-break:break-all;line-height:1.5;}
+  .copy-btn{background:rgba(108,99,255,0.15);border:1px solid rgba(108,99,255,0.3);color:var(--accent);border-radius:8px;padding:8px 14px;font-size:0.8rem;cursor:pointer;white-space:nowrap;transition:all 0.2s;font-family:inherit;}
+  .copy-btn:hover{background:var(--accent);color:#fff;}
+  .copy-btn.copied{background:rgba(67,233,123,0.15);border-color:rgba(67,233,123,0.3);color:#43e97b;}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="index.html">Giggles<span>Galaxy</span> Tools</a>
+  <a class="back-btn" href="index.html">← All Tools</a>
+</header>
+<main>
+  <h1>✨ Fancy <span>Font Generator</span></h1>
+  <p class="subtitle">Generate stylish unicode text for Instagram, Twitter & social media bios</p>
+
+  <div class="input-area">
+    <textarea id="inputText" placeholder="Type your text here..." oninput="generateFonts(this.value)"></textarea>
+  </div>
+
+  <div class="results" id="results"></div>
+</main>
+<script>
+const styles = [
+  {name:'𝐁𝐨𝐥𝐝',map:(c)=>shift(c,0x1D400,0x1D41A,'A','a')},
+  {name:'𝘐𝘵𝘢𝘭𝘪𝘤',map:(c)=>shift(c,0x1D434,0x1D44E,'A','a')},
+  {name:'𝑩𝒐𝒍𝒅 𝑰𝒕𝒂𝒍𝒊𝒄',map:(c)=>shift(c,0x1D468,0x1D482,'A','a')},
+  {name:'𝕯𝖔𝖚𝖇𝖑𝖊 𝕾𝖙𝖗𝖚𝖐𝖊',map:(c)=>shift(c,0x1D56B,0x1D585,'A','a')},
+  {name:'𝔊𝔬𝔱𝔥𝔦𝔠',map:(c)=>shift(c,0x1D504,0x1D51E,'A','a')},
+  {name:'𝒮𝒸𝓇𝒾𝓅𝓉',map:(c)=>shift(c,0x1D4D0,0x1D4EA,'A','a')},
+  {name:'𝓑𝓸𝓵𝓭 𝓢𝓬𝓻𝓲𝓹𝓽',map:(c)=>shift(c,0x1D4F6,0x1D510,'A','a')},
+  {name:'Ⓒⓘⓡⓒⓛⓔⓓ',map:(c)=>circled(c)},
+  {name:'S̶t̶r̶i̶k̶e̶t̶h̶r̶o̶u̶g̶h̶',map:(c)=>c+'\u0336'},
+  {name:'U͟n͟d͟e͟r͟l͟i͟n͟e͟d͟',map:(c)=>c+'\u0332'},
+  {name:'ᴸᴵᴷᴱ ˢᴹᴬᴸᴸ',map:(c)=>superscript(c)},
+  {name:'ＷＩＤＥ',map:(c)=>wide(c)},
+  {name:'uʍop ǝpᴉsdn',map:(c)=>flip(c)},
+  {name:'ꜱᴘᴀᴄᴇᴅ ᴄᴀᴘꜱ',map:(c)=>smallCaps(c)},
+  {name:'Z̤͜͡H̓̆Å̷L̮͜O̷͌',map:(c)=>c+zalgo()},
+  {name:'•.¸¸.• Bubbles •.¸¸.•',isDecorator:true,fn:(t)=>'•.¸¸.• '+t+' •.¸¸.•'},
+  {name:'★彡 Star Frame 彡★',isDecorator:true,fn:(t)=>'★彡 '+t+' 彡★'},
+  {name:'꧁༒☬ Dark Border ☬༒꧂',isDecorator:true,fn:(t)=>'꧁༒☬ '+t+' ☬༒꧂'},
+];
+
+function shift(c,upperStart,lowerStart,upperBase,lowerBase){
+  const cu=c.charCodeAt(0);
+  if(c>='A'&&c<='Z') return String.fromCodePoint(upperStart+(cu-65));
+  if(c>='a'&&c<='z') return String.fromCodePoint(lowerStart+(cu-97));
+  return c;
+}
+function circled(c){
+  const upMap='ⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏ';
+  const loMap='ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ';
+  if(c>='A'&&c<='Z') return upMap[c.charCodeAt(0)-65];
+  if(c>='a'&&c<='z') return loMap[c.charCodeAt(0)-97];
+  if(c>='0'&&c<='9') return ['⓪','①','②','③','④','⑤','⑥','⑦','⑧','⑨'][+c];
+  return c;
+}
+function wide(c){const cu=c.charCodeAt(0);if(cu>=33&&cu<=126)return String.fromCharCode(0xFF01+(cu-33));return c==' '?'　':c;}
+const flipMap={a:'ɐ',b:'q',c:'ɔ',d:'p',e:'ǝ',f:'ɟ',g:'ƃ',h:'ɥ',i:'ᴉ',j:'ɾ',k:'ʞ',l:'l',m:'ɯ',n:'u',o:'o',p:'d',q:'b',r:'ɹ',s:'s',t:'ʇ',u:'n',v:'ʌ',w:'ʍ',x:'x',y:'ʎ',z:'z',A:'∀',B:'ᗺ',C:'Ↄ',D:'ᗡ',E:'Ǝ',F:'Ⅎ',G:'⅁',H:'H',I:'I',J:'ſ',K:'ʞ',L:'⅂',M:'W',N:'N',O:'O',P:'Ԁ',Q:'Q',R:'ᴚ',S:'S',T:'┴',U:'∩',V:'Λ',W:'M',X:'X',Y:'⅄',Z:'Z'};
+function flip(c){return flipMap[c]||c;}
+const supMap={a:'ᵃ',b:'ᵇ',c:'ᶜ',d:'ᵈ',e:'ᵉ',f:'ᶠ',g:'ᵍ',h:'ʰ',i:'ⁱ',j:'ʲ',k:'ᵏ',l:'ˡ',m:'ᵐ',n:'ⁿ',o:'ᵒ',p:'ᵖ',q:'q',r:'ʳ',s:'ˢ',t:'ᵗ',u:'ᵘ',v:'ᵛ',w:'ʷ',x:'ˣ',y:'ʸ',z:'ᶻ',A:'ᴬ',B:'ᴮ',C:'ᶜ',D:'ᴰ',E:'ᴱ',F:'ᶠ',G:'ᴳ',H:'ᴴ',I:'ᴵ',J:'ᴶ',K:'ᴷ',L:'ᴸ',M:'ᴹ',N:'ᴺ',O:'ᴼ',P:'ᴾ',Q:'Q',R:'ᴿ',S:'ˢ',T:'ᵀ',U:'ᵁ',V:'ⱽ',W:'ᵂ',X:'ˣ',Y:'ʸ',Z:'ᶻ'};
+function superscript(c){return supMap[c]||c;}
+const scMap={a:'ᴀ',b:'ʙ',c:'ᴄ',d:'ᴅ',e:'ᴇ',f:'ꜰ',g:'ɢ',h:'ʜ',i:'ɪ',j:'ᴊ',k:'ᴋ',l:'ʟ',m:'ᴍ',n:'ɴ',o:'ᴏ',p:'ᴘ',q:'q',r:'ʀ',s:'ꜱ',t:'ᴛ',u:'ᴜ',v:'ᴠ',w:'ᴡ',x:'x',y:'ʏ',z:'ᴢ'};
+function smallCaps(c){return scMap[c.toLowerCase()]||c;}
+const zalgoUp=['\u030d','\u030e','\u0304','\u0305','\u033f','\u0311','\u0306','\u0310','\u0352','\u0357'];
+function zalgo(){return zalgoUp[Math.floor(Math.random()*zalgoUp.length)];}
+
+function applyStyle(text,style){
+  if(style.isDecorator) return style.fn(text);
+  return [...text].map(c=>style.map(c)).join('');
+}
+function generateFonts(text){
+  const container=document.getElementById('results');
+  if(!text.trim()){container.innerHTML='';return;}
+  container.innerHTML=styles.map((s,i)=>{
+    const out=applyStyle(text,s);
+    return `<div class="font-card">
+      <span class="style-label">${s.name}</span>
+      <span class="text" id="ft${i}">${out}</span>
+      <button class="copy-btn" onclick="copyFont(${i})">Copy</button>
+    </div>`;
+  }).join('');
+}
+function copyFont(i){
+  const el=document.getElementById('ft'+i);
+  navigator.clipboard.writeText(el.textContent);
+  const btn=el.parentElement.querySelector('.copy-btn');
+  btn.textContent='✓ Copied!';btn.classList.add('copied');
+  setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},1500);
+}
+</script>
+</body>
+</html>

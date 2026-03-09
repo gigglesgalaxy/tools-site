@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Age Calculator — GigglesGalaxy Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0a0a0f;--card:#13131a;--border:#1e1e2e;--accent:#6c63ff;--accent2:#ff6584;--text:#e8e8f0;--muted:#7070a0; }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(108,99,255,0.08) 0%,transparent 60%);pointer-events:none;}
+  header{background:rgba(10,10,15,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:18px 40px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;text-decoration:none;color:var(--text);}
+  .logo span{color:var(--accent);}
+  .back-btn{display:flex;align-items:center;gap:8px;color:var(--muted);text-decoration:none;font-size:0.9rem;transition:color 0.2s;}
+  .back-btn:hover{color:var(--accent);}
+  main{max-width:700px;margin:0 auto;padding:60px 24px;position:relative;z-index:1;}
+  h1{font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;margin-bottom:8px;}
+  h1 span{color:var(--accent);}
+  .subtitle{color:var(--muted);margin-bottom:40px;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:36px;}
+  label{display:block;font-size:0.85rem;font-weight:500;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;}
+  input[type="date"]{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px 18px;color:var(--text);font-family:inherit;font-size:1rem;outline:none;transition:border-color 0.2s;margin-bottom:24px;}
+  input[type="date"]:focus{border-color:var(--accent);}
+  input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(1);opacity:0.5;}
+  .btn{width:100%;background:linear-gradient(135deg,var(--accent),#a855f7);border:none;border-radius:12px;padding:16px;color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;transition:transform 0.15s,opacity 0.15s;}
+  .btn:hover{transform:translateY(-2px);opacity:0.9;}
+  .result{margin-top:32px;display:none;}
+  .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+  .result-box{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:20px;text-align:center;}
+  .result-box .val{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;color:var(--accent);}
+  .result-box .lbl{color:var(--muted);font-size:0.8rem;margin-top:4px;}
+  .extra-stat{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .extra-stat .key{color:var(--muted);font-size:0.9rem;}
+  .extra-stat .v{font-family:'Syne',sans-serif;font-weight:700;color:var(--accent2);}
+  .next-bday{background:linear-gradient(135deg,rgba(108,99,255,0.1),rgba(168,85,247,0.1));border:1px solid rgba(108,99,255,0.3);border-radius:14px;padding:20px;text-align:center;margin-top:16px;}
+  .next-bday .label{color:var(--muted);font-size:0.85rem;margin-bottom:6px;}
+  .next-bday .days{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:var(--accent);}
+  @media(max-width:500px){.result-grid{grid-template-columns:1fr 1fr;}.result-box .val{font-size:1.6rem;}h1{font-size:1.8rem;}}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="index.html">Giggles<span>Galaxy</span> Tools</a>
+  <a class="back-btn" href="index.html">← All Tools</a>
+</header>
+<main>
+  <h1>🎂 Age <span>Calculator</span></h1>
+  <p class="subtitle">Find your exact age in years, months, days, hours & more</p>
+
+  <div class="card">
+    <label>Your Date of Birth</label>
+    <input type="date" id="dob" max="">
+
+    <label>Calculate As Of</label>
+    <input type="date" id="calcDate">
+
+    <button class="btn" onclick="calcAge()">Calculate My Age</button>
+
+    <div class="result" id="result">
+      <div class="result-grid">
+        <div class="result-box"><div class="val" id="rYears">0</div><div class="lbl">Years</div></div>
+        <div class="result-box"><div class="val" id="rMonths">0</div><div class="lbl">Months</div></div>
+        <div class="result-box"><div class="val" id="rDays">0</div><div class="lbl">Days</div></div>
+        <div class="result-box"><div class="val" id="rWeeks">0</div><div class="lbl">Weeks (total)</div></div>
+      </div>
+      <div class="extra-stat"><span class="key">Total Days Lived</span><span class="v" id="rTotalDays">—</span></div>
+      <div class="extra-stat"><span class="key">Total Hours Lived</span><span class="v" id="rHours">—</span></div>
+      <div class="extra-stat"><span class="key">Total Minutes Lived</span><span class="v" id="rMinutes">—</span></div>
+      <div class="extra-stat"><span class="key">Day of Week Born</span><span class="v" id="rDow">—</span></div>
+      <div class="next-bday"><div class="label">🎉 Next Birthday In</div><div class="days" id="rNextBday">—</div></div>
+    </div>
+  </div>
+</main>
+<script>
+const today = new Date();
+document.getElementById('dob').max = today.toISOString().split('T')[0];
+document.getElementById('calcDate').value = today.toISOString().split('T')[0];
+document.getElementById('calcDate').max = today.toISOString().split('T')[0];
+
+function calcAge() {
+  const dob = new Date(document.getElementById('dob').value);
+  const calc = new Date(document.getElementById('calcDate').value);
+  if(!document.getElementById('dob').value){alert('Please enter your date of birth');return;}
+  if(dob > calc){alert('Birth date cannot be after calculation date');return;}
+
+  let years = calc.getFullYear() - dob.getFullYear();
+  let months = calc.getMonth() - dob.getMonth();
+  let days = calc.getDate() - dob.getDate();
+
+  if(days < 0){ months--; const prev = new Date(calc.getFullYear(), calc.getMonth(), 0); days += prev.getDate(); }
+  if(months < 0){ years--; months += 12; }
+
+  const totalDays = Math.floor((calc - dob) / 86400000);
+  const totalWeeks = Math.floor(totalDays / 7);
+  const dow = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][dob.getDay()];
+
+  let nextBday = new Date(calc.getFullYear(), dob.getMonth(), dob.getDate());
+  if(nextBday <= calc) nextBday.setFullYear(nextBday.getFullYear() + 1);
+  const daysToNext = Math.floor((nextBday - calc) / 86400000);
+
+  document.getElementById('rYears').textContent = years;
+  document.getElementById('rMonths').textContent = months;
+  document.getElementById('rDays').textContent = days;
+  document.getElementById('rWeeks').textContent = totalWeeks.toLocaleString();
+  document.getElementById('rTotalDays').textContent = totalDays.toLocaleString();
+  document.getElementById('rHours').textContent = (totalDays * 24).toLocaleString();
+  document.getElementById('rMinutes').textContent = (totalDays * 24 * 60).toLocaleString();
+  document.getElementById('rDow').textContent = dow;
+  document.getElementById('rNextBday').textContent = daysToNext === 0 ? '🎉 Today!' : daysToNext + ' days';
+  document.getElementById('result').style.display = 'block';
+}
+</script>
+</body>
+</html>
